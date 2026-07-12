@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import logging
+import json
 from typing import Any, cast
 
 from aiohttp import ClientError, ClientSession
@@ -13,8 +13,6 @@ from homeassistant.helpers.config_entry_oauth2_flow import OAuth2Session
 from homeassistant.util import dt as dt_util
 
 from .const import API_BASE_URL
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class EnergyDeviceApiError(Exception):
@@ -116,7 +114,7 @@ class EnergyDeviceApi:
         path: str,
         *,
         params: dict[str, str] | None = None,
-        json: dict[str, Any] | None = None,
+        json_body: dict[str, Any] | None = None,
     ) -> Any:
         token = await self._auth.async_get_access_token()
         headers = {
@@ -128,25 +126,28 @@ class EnergyDeviceApi:
                 method,
                 f"{API_BASE_URL}{path}",
                 params=params,
-                json=json,
+                json=json_body,
                 headers=headers,
             )
+            if response.status in (401, 403):
+                raise EnergyDeviceAuthError(
+                    f"Authentication failed: {response.status}"
+                )
+            if response.status in (409, 422):
+                body = await response.json()
+                raise WallboxOperationError(body["message"], body["code"])
+            if response.status >= 400:
+                raise EnergyDeviceApiError(f"API error: {response.status}")
+            text = await response.text()
         except ClientError as err:
             raise EnergyDeviceApiError(f"Connection error: {err}") from err
 
-        if response.status in (401, 403):
-            raise EnergyDeviceAuthError(f"Authentication failed: {response.status}")
-        if response.status in (409, 422):
-            body = await response.json()
-            raise WallboxOperationError(body["message"], body["code"])
-        if response.status >= 400:
-            raise EnergyDeviceApiError(f"API error: {response.status}")
-        if response.status == 204:
+        if not text:
             return None
         try:
-            return await response.json()
-        except (ValueError, AttributeError):
-            return None
+            return json.loads(text)
+        except ValueError as err:
+            raise EnergyDeviceApiError(f"Invalid JSON response: {err}") from err
 
     async def async_get_wallbox_state(self, wallbox_id: str) -> str:
         """Return the wallbox state."""
@@ -214,7 +215,7 @@ class EnergyDeviceApi:
         await self._request(
             "POST",
             f"/wallbox/{wallbox_id}/chargingSchedule",
-            json={
+            json_body={
                 "start": dt_util.as_utc(start).isoformat(),
                 "periods": periods,
                 "scheduleId": {"value": schedule_id},
@@ -233,13 +234,13 @@ class EnergyDeviceApi:
     async def async_add_id_token(self, name: str, token: str) -> None:
         """Add an ID token."""
         await self._request(
-            "POST", "/user/idTokens", json={"name": name, "token": token}
+            "POST", "/user/idTokens", json_body={"name": name, "token": token}
         )
 
     async def async_update_id_token(self, name: str, token: str) -> None:
         """Update an ID token's name."""
         await self._request(
-            "PATCH", "/user/idTokens", json={"name": name, "token": token}
+            "PATCH", "/user/idTokens", json_body={"name": name, "token": token}
         )
 
     async def async_delete_id_token(self, token: str) -> None:
