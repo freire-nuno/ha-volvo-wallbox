@@ -1,0 +1,1 @@
+"""The Volvo Wallbox integration."""
