@@ -15,7 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .api import EnergyDeviceApi, WallboxOperationError
+from .api import EnergyDeviceApi, EnergyDeviceApiError, WallboxOperationError
 from .const import DOMAIN
 from .coordinator import VolvoWallboxConfigEntry, WallboxCoordinator
 from .entity import VolvoWallboxEntity
@@ -84,7 +84,6 @@ class VolvoWallboxNumber(VolvoWallboxEntity, RestoreNumber):
         """Initialize the number."""
         super().__init__(coordinator, description.key)
         self.entity_description = description
-        self._attr_available = True
 
     @property
     def available(self) -> bool:
@@ -116,6 +115,12 @@ class VolvoWallboxNumber(VolvoWallboxEntity, RestoreNumber):
                 translation_domain=DOMAIN,
                 translation_key="operation_failed",
                 translation_placeholders={"message": str(err), "code": err.code},
+            ) from err
+        except EnergyDeviceApiError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="api_error",
+                translation_placeholders={"message": str(err)},
             ) from err
         self._attr_native_value = value
         self.async_write_ha_state()

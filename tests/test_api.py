@@ -164,6 +164,43 @@ async def test_get_id_tokens(
     assert tokens == [IdToken(name="My card", token="rfid-1")]
 
 
+async def test_invalid_json_body_raises_api_error(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A 200 response with a non-JSON body raises EnergyDeviceApiError."""
+    aioclient_mock.get(
+        f"{API_BASE_URL}/wallbox/{WALLBOX_ID}", status=200, text="not-json"
+    )
+
+    with pytest.raises(EnergyDeviceApiError):
+        await _api(hass).async_get_wallbox_state(WALLBOX_ID)
+
+
+async def test_empty_body_write_endpoint_returns_cleanly(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A 202 with an empty body on a write endpoint returns without error."""
+    aioclient_mock.post(f"{API_BASE_URL}/wallbox/{WALLBOX_ID}/start", status=202)
+
+    await _api(hass).async_start_charging(WALLBOX_ID)
+
+
+async def test_operation_error_non_json_body_raises_api_error(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A 409 with a non-JSON body raises EnergyDeviceApiError, not WallboxOperationError."""
+    aioclient_mock.post(
+        f"{API_BASE_URL}/wallbox/{WALLBOX_ID}/start",
+        status=409,
+        text="<html>Error</html>",
+    )
+
+    with pytest.raises(EnergyDeviceApiError) as err:
+        await _api(hass).async_start_charging(WALLBOX_ID)
+
+    assert not isinstance(err.value, WallboxOperationError)
+
+
 async def test_apply_charging_schedule_payload(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:

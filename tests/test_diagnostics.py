@@ -25,3 +25,4 @@ async def test_diagnostics_redacts_secrets(
     assert diagnostics["entry_data"]["token"]["refresh_token"] == "**REDACTED**"
     assert diagnostics["data"]["state"] == "CHARGING"
     assert len(diagnostics["data"]["sessions"]) == 3
+    assert diagnostics["data"]["sessions"][0]["id_token"] == "**REDACTED**"

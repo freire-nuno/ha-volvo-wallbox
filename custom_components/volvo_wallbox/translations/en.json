@@ -24,7 +24,7 @@
       }
     },
     "error": {
-      "invalid_api_key": "The API key is not valid for the Energy Device API.",
+      "invalid_api_key": "The API key is not valid for the Energy Device API. Also verify that the SCOPES list in const.py matches the scopes on the developer portal.",
       "invalid_wallbox_id": "No wallbox found with this ID. Try another value (serial number, PNC, ...)."
     },
     "abort": {
@@ -110,6 +110,7 @@
       "name": "Add ID token",
       "description": "Registers a new RFID ID token on your account.",
       "fields": {
+        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
         "name": { "name": "Name", "description": "Friendly name for the token." },
         "token": { "name": "Token", "description": "The RFID token value." }
       }
@@ -118,6 +119,7 @@
       "name": "Update ID token",
       "description": "Renames an existing RFID ID token.",
       "fields": {
+        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
         "name": { "name": "Name", "description": "New friendly name." },
         "token": { "name": "Token", "description": "The RFID token value." }
       }
@@ -126,6 +128,7 @@
       "name": "Delete ID token",
       "description": "Removes an RFID ID token from your account.",
       "fields": {
+        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
         "token": { "name": "Token", "description": "The RFID token value to delete." }
       }
     }
@@ -133,6 +136,9 @@
   "exceptions": {
     "operation_failed": {
       "message": "Wallbox operation failed: {message} ({code})"
+    },
+    "api_error": {
+      "message": "Communication with the Volvo API failed: {message}"
     },
     "device_not_found": {
       "message": "No Volvo Wallbox found for the given device."

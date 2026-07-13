@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import json
 from typing import Any, cast
+from urllib.parse import quote
 
 from aiohttp import ClientError, ClientSession
 
@@ -134,8 +135,15 @@ class EnergyDeviceApi:
                     f"Authentication failed: {response.status}"
                 )
             if response.status in (409, 422):
-                body = await response.json()
-                raise WallboxOperationError(body["message"], body["code"])
+                try:
+                    body = await response.json(content_type=None)
+                    message = body["message"]
+                    code = body["code"]
+                except (ValueError, KeyError, TypeError) as err:
+                    raise EnergyDeviceApiError(
+                        f"API error: {response.status}"
+                    ) from err
+                raise WallboxOperationError(message, code)
             if response.status >= 400:
                 raise EnergyDeviceApiError(f"API error: {response.status}")
             text = await response.text()
@@ -245,4 +253,4 @@ class EnergyDeviceApi:
 
     async def async_delete_id_token(self, token: str) -> None:
         """Delete an ID token."""
-        await self._request("DELETE", f"/user/idTokens/{token}")
+        await self._request("DELETE", f"/user/idTokens/{quote(token, safe='')}")

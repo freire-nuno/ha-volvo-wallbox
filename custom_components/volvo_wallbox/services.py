@@ -18,7 +18,7 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.util import dt as dt_util
 
-from .api import WallboxOperationError
+from .api import EnergyDeviceApiError, WallboxOperationError
 from .const import DOMAIN
 from .coordinator import WallboxCoordinator
 
@@ -107,6 +107,14 @@ def _wrap_operation_error(err: WallboxOperationError) -> HomeAssistantError:
     )
 
 
+def _wrap_api_error(err: EnergyDeviceApiError) -> HomeAssistantError:
+    return HomeAssistantError(
+        translation_domain=DOMAIN,
+        translation_key="api_error",
+        translation_placeholders={"message": str(err)},
+    )
+
+
 async def _start_charging(call: ServiceCall) -> None:
     coordinator = _get_coordinator(call)
     try:
@@ -115,6 +123,8 @@ async def _start_charging(call: ServiceCall) -> None:
         )
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 async def _apply_charging_schedule(call: ServiceCall) -> None:
@@ -146,6 +156,8 @@ async def _apply_charging_schedule(call: ServiceCall) -> None:
         )
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 async def _get_charging_sessions(call: ServiceCall) -> ServiceResponse:
@@ -159,6 +171,8 @@ async def _get_charging_sessions(call: ServiceCall) -> ServiceResponse:
         )
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
     return {
         "sessions": [
             {
@@ -180,6 +194,8 @@ async def _read_id_token(call: ServiceCall) -> None:
         await coordinator.api.async_read_id_token(coordinator.wallbox_id)
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 async def _add_id_token(call: ServiceCall) -> None:
@@ -190,6 +206,8 @@ async def _add_id_token(call: ServiceCall) -> None:
         )
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 async def _update_id_token(call: ServiceCall) -> None:
@@ -200,6 +218,8 @@ async def _update_id_token(call: ServiceCall) -> None:
         )
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 async def _delete_id_token(call: ServiceCall) -> None:
@@ -208,6 +228,8 @@ async def _delete_id_token(call: ServiceCall) -> None:
         await coordinator.api.async_delete_id_token(call.data[ATTR_TOKEN])
     except WallboxOperationError as err:
         raise _wrap_operation_error(err) from err
+    except EnergyDeviceApiError as err:
+        raise _wrap_api_error(err) from err
 
 
 @callback
