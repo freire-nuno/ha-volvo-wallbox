@@ -36,6 +36,7 @@ class WallboxData:
     last_session: ChargingSession | None
     energy_today: float
     energy_this_month: float
+    energy_this_year: float
 
 
 def find_current_session(
@@ -84,15 +85,16 @@ class WallboxCoordinator(DataUpdateCoordinator[WallboxData]):
         self.wallbox_id: str = entry.data[CONF_WALLBOX_ID]
 
     async def _async_update_data(self) -> WallboxData:
-        """Fetch wallbox state and this month's sessions."""
+        """Fetch wallbox state and this year's sessions."""
         now = dt_util.now()
+        year_start = dt_util.start_of_local_day(now.replace(month=1, day=1))
         month_start = dt_util.start_of_local_day(now.replace(day=1))
         today_start = dt_util.start_of_local_day(now)
 
         try:
             state = await self.api.async_get_wallbox_state(self.wallbox_id)
             sessions = await self.api.async_get_charging_sessions(
-                self.wallbox_id, month_start, now
+                self.wallbox_id, year_start, now
             )
         except EnergyDeviceAuthError as err:
             raise ConfigEntryAuthFailed(err) from err
@@ -106,4 +108,5 @@ class WallboxCoordinator(DataUpdateCoordinator[WallboxData]):
             last_session=find_last_completed_session(sessions),
             energy_today=energy_since(sessions, today_start),
             energy_this_month=energy_since(sessions, month_start),
+            energy_this_year=energy_since(sessions, year_start),
         )

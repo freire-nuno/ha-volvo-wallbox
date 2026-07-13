@@ -107,6 +107,7 @@ async def test_setup_entry(
     coordinator = mock_config_entry.runtime_data
     assert coordinator.data.state == "CHARGING"
     assert coordinator.data.energy_this_month == 18.0
+    assert coordinator.data.energy_this_year == 18.0
 
 
 async def test_setup_entry_auth_error_starts_reauth(

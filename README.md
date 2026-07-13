@@ -5,8 +5,8 @@ Custom integration for Volvo-branded wallboxes using the official
 
 ## Features
 
-- Consumption sensors: current session, today, this month, last session
-  (Energy-dashboard compatible)
+- Consumption sensors: current session, today, this month, this year,
+  last session (Energy-dashboard compatible)
 - Charging state sensor
 - Start / pause charging buttons
 - Charging and discharging (V2G/V2H) amp limit controls
@@ -25,6 +25,7 @@ ID) with the following entities and services.
 | `sensor.volvo_wallbox_current_session_energy` | Energy of the ongoing charging session (kWh); `0.0` when idle |
 | `sensor.volvo_wallbox_energy_today` | Energy charged today (kWh, local-day boundary) — usable in the Energy dashboard |
 | `sensor.volvo_wallbox_energy_this_month` | Energy charged this month (kWh) — usable in the Energy dashboard |
+| `sensor.volvo_wallbox_energy_this_year` | Energy charged this year (kWh) — usable in the Energy dashboard |
 | `sensor.volvo_wallbox_last_session_energy` | Energy of the last completed session (kWh) |
 | `sensor.volvo_wallbox_last_session_start` | Start of the last completed session (timestamp, diagnostic) |
 | `sensor.volvo_wallbox_last_session_end` | End of the last completed session (timestamp, diagnostic) |
@@ -71,7 +72,9 @@ ID) with the following entities and services.
    `custom_components/volvo_wallbox/const.py` (`SCOPES`) matches the scopes
    shown on the Energy Device API overview page in the developer portal.
 3. Your wallbox ID (try the serial number from the Volvo Cars app or the
-   unit's label — the config flow validates it and lets you retry).
+   unit's label — the config flow validates it and lets you retry). It looks
+   like `WBVA1ABCD-WB24.01.2500001234` (a product code, `-WB`, then a
+   dot-separated serial).
 
 ## Installation
 

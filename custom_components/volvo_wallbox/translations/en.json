@@ -53,21 +53,46 @@
   },
   "entity": {
     "sensor": {
-      "charging_state": { "name": "Charging state" },
-      "current_session_energy": { "name": "Current session energy" },
-      "energy_today": { "name": "Energy today" },
-      "energy_this_month": { "name": "Energy this month" },
-      "last_session_energy": { "name": "Last session energy" },
-      "last_session_start": { "name": "Last session start" },
-      "last_session_end": { "name": "Last session end" }
+      "charging_state": {
+        "name": "Charging state"
+      },
+      "current_session_energy": {
+        "name": "Current session energy"
+      },
+      "energy_today": {
+        "name": "Energy today"
+      },
+      "energy_this_month": {
+        "name": "Energy this month"
+      },
+      "energy_this_year": {
+        "name": "Energy this year"
+      },
+      "last_session_energy": {
+        "name": "Last session energy"
+      },
+      "last_session_start": {
+        "name": "Last session start"
+      },
+      "last_session_end": {
+        "name": "Last session end"
+      }
     },
     "button": {
-      "start_charging": { "name": "Start charging" },
-      "pause_charging": { "name": "Pause charging" }
+      "start_charging": {
+        "name": "Start charging"
+      },
+      "pause_charging": {
+        "name": "Pause charging"
+      }
     },
     "number": {
-      "charging_amp_limit": { "name": "Charging amp limit" },
-      "discharging_amp_limit": { "name": "Discharging amp limit" }
+      "charging_amp_limit": {
+        "name": "Charging amp limit"
+      },
+      "discharging_amp_limit": {
+        "name": "Discharging amp limit"
+      }
     }
   },
   "services": {
@@ -75,61 +100,118 @@
       "name": "Start charging",
       "description": "Starts charging, optionally on behalf of an RFID ID token.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "id_token": { "name": "ID token", "description": "Optional RFID ID token to start the session with." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "id_token": {
+          "name": "ID token",
+          "description": "Optional RFID ID token to start the session with."
+        }
       }
     },
     "apply_charging_schedule": {
       "name": "Apply charging schedule",
       "description": "Applies a transactional charging schedule to the wallbox.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "start": { "name": "Start", "description": "When the schedule starts." },
-        "periods": { "name": "Periods", "description": "List of periods, each with type (watt or ampere), value and duration (HH:MM:SS)." },
-        "schedule_id": { "name": "Schedule ID", "description": "Optional schedule identifier." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "start": {
+          "name": "Start",
+          "description": "When the schedule starts."
+        },
+        "periods": {
+          "name": "Periods",
+          "description": "List of periods, each with type (watt or ampere), value and duration (HH:MM:SS)."
+        },
+        "schedule_id": {
+          "name": "Schedule ID",
+          "description": "Optional schedule identifier."
+        }
       }
     },
     "get_charging_sessions": {
       "name": "Get charging sessions",
       "description": "Returns charging sessions in a time range.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "start": { "name": "Start", "description": "Range start." },
-        "end": { "name": "End", "description": "Range end." },
-        "id_token": { "name": "ID token", "description": "Optional RFID ID token filter." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "start": {
+          "name": "Start",
+          "description": "Range start."
+        },
+        "end": {
+          "name": "End",
+          "description": "Range end."
+        },
+        "id_token": {
+          "name": "ID token",
+          "description": "Optional RFID ID token filter."
+        }
       }
     },
     "read_id_token": {
       "name": "Read ID token",
       "description": "Puts the wallbox in RFID read mode to learn a new token.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        }
       }
     },
     "add_id_token": {
       "name": "Add ID token",
       "description": "Registers a new RFID ID token on your account.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "name": { "name": "Name", "description": "Friendly name for the token." },
-        "token": { "name": "Token", "description": "The RFID token value." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "name": {
+          "name": "Name",
+          "description": "Friendly name for the token."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value."
+        }
       }
     },
     "update_id_token": {
       "name": "Update ID token",
       "description": "Renames an existing RFID ID token.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "name": { "name": "Name", "description": "New friendly name." },
-        "token": { "name": "Token", "description": "The RFID token value." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "name": {
+          "name": "Name",
+          "description": "New friendly name."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value."
+        }
       }
     },
     "delete_id_token": {
       "name": "Delete ID token",
       "description": "Removes an RFID ID token from your account.",
       "fields": {
-        "device_id": { "name": "Wallbox", "description": "The wallbox device." },
-        "token": { "name": "Token", "description": "The RFID token value to delete." }
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value to delete."
+        }
       }
     }
   },

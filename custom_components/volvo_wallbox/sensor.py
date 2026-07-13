@@ -56,6 +56,13 @@ SENSOR_DESCRIPTIONS: tuple[VolvoWallboxSensorDescription, ...] = (
         value_fn=lambda data: data.energy_this_month,
     ),
     VolvoWallboxSensorDescription(
+        key="energy_this_year",
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_fn=lambda data: data.energy_this_year,
+    ),
+    VolvoWallboxSensorDescription(
         key="last_session_energy",
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,

@@ -35,6 +35,7 @@ def _sensor_only_platform() -> Generator[None]:
         # previous day and only the 09:00 UTC session (2.5 kWh) counts.
         pytest.param("sensor.volvo_wallbox_energy_today", "2.5", id="today"),
         pytest.param("sensor.volvo_wallbox_energy_this_month", "18.0", id="month"),
+        pytest.param("sensor.volvo_wallbox_energy_this_year", "18.0", id="year"),
         pytest.param(
             "sensor.volvo_wallbox_last_session_energy", "5.5", id="last_energy"
         ),
@@ -100,6 +101,7 @@ async def test_sensor_states_no_sessions(
             last_session=None,
             energy_today=0.0,
             energy_this_month=0.0,
+            energy_this_year=0.0,
         )
     )
     await hass.async_block_till_done()
