@@ -76,12 +76,13 @@ ID) with the following entities and services.
    like `WBVA1ABCD-WB24.01.2500001234` (a product code, `-WB`, then a
    dot-separated serial).
 
-> **Note on credential lifetime:** a newly created Volvo API application has
-> *test* credentials that expire after ~30 days. When that happens the
-> integration will ask for re-authentication — see
-> [Renewing expired credentials](#renewing-expired-credentials). To avoid
-> this entirely, request **publication** of your application in the
-> developer portal — published (production) credentials are long-lived.
+> **Note on credential lifetime:** **publish** your application in the
+> developer portal (the Publish button under the app — instant, no review
+> wait). Published applications have a permanent client ID and long-lived
+> client secrets; the "30 days" shown when generating a new secret is only a
+> grace period during which the *old* secret keeps working after a rotation.
+> Unpublished (test) applications are time-limited. If credentials ever need
+> replacing, see [Renewing expired credentials](#renewing-expired-credentials).
 
 ## Installation
 
