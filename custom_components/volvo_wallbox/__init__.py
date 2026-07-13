@@ -4,15 +4,25 @@ from __future__ import annotations
 
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import aiohttp_client, config_validation as cv
 from homeassistant.helpers.config_entry_oauth2_flow import (
     OAuth2Session,
     async_get_config_entry_implementation,
 )
+from homeassistant.helpers.typing import ConfigType
 
 from .api import EnergyDeviceApi, VolvoWallboxAuth
-from .const import PLATFORMS
+from .const import DOMAIN, PLATFORMS
 from .coordinator import VolvoWallboxConfigEntry, WallboxCoordinator
+from .services import async_setup_services
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the Volvo Wallbox integration."""
+    async_setup_services(hass)
+    return True
 
 
 async def async_setup_entry(
