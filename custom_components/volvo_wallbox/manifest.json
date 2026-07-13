@@ -1,13 +1,13 @@
 {
   "domain": "volvo_wallbox",
   "name": "Volvo Wallbox",
-  "codeowners": [],
+  "codeowners": ["@freire-nuno"],
   "config_flow": true,
   "dependencies": ["application_credentials"],
-  "documentation": "https://github.com/nfreire/ha-volvo-wallbox",
+  "documentation": "https://github.com/freire-nuno/ha-volvo-wallbox",
   "integration_type": "device",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/nfreire/ha-volvo-wallbox/issues",
+  "issue_tracker": "https://github.com/freire-nuno/ha-volvo-wallbox/issues",
   "requirements": [],
   "version": "0.1.0"
 }
