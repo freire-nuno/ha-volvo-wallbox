@@ -76,6 +76,15 @@ ID) with the following entities and services.
    like `WBVA1ABCD-WB24.01.2500001234` (a product code, `-WB`, then a
    dot-separated serial).
 
+> **Note on credential lifetime:** a newly created Volvo API application has
+> *test* credentials that expire after ~30 days. When that happens, token
+> refresh fails and re-authentication keeps failing until you renew the
+> credentials in the developer portal and update them in Home Assistant
+> (Settings → Devices & services → menu → Application credentials → replace
+> the entry, then reauthenticate the integration). To avoid this entirely,
+> request **publication** of your application in the developer portal —
+> published (production) credentials are long-lived.
+
 ## Installation
 
 Copy `custom_components/volvo_wallbox` into your Home Assistant `config/custom_components/`
