@@ -22,7 +22,7 @@ from homeassistant.components.application_credentials import (
     async_import_client_credential,
 )
 from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
+from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import config_entry_oauth2_flow
@@ -178,3 +178,96 @@ async def test_duplicate_wallbox_aborts(
 
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
+
+
+@pytest.mark.usefixtures("current_request_with_host")
+async def test_reauth_flow(
+    hass: HomeAssistant,
+    hass_client_no_auth: ClientSessionGenerator,
+    aioclient_mock: AiohttpClientMocker,
+) -> None:
+    """Reauth refreshes the token without asking for the wallbox ID."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=WALLBOX_ID,
+        data={
+            "auth_implementation": DOMAIN,
+            CONF_TOKEN: {
+                "access_token": "old-access-token",
+                "refresh_token": "old-refresh-token",
+                "expires_in": 3600,
+            },
+            CONF_API_KEY: "vcc-key",
+            CONF_WALLBOX_ID: WALLBOX_ID,
+        },
+    )
+    entry.add_to_hass(hass)
+
+    entry.async_start_reauth(hass)
+    await hass.async_block_till_done()
+
+    flows = hass.config_entries.flow.async_progress()
+    assert len(flows) == 1
+    flow_id = flows[0]["flow_id"]
+    assert flows[0]["step_id"] == "reauth_confirm"
+
+    result = await hass.config_entries.flow.async_configure(flow_id, {})
+    assert result["type"] is FlowResultType.EXTERNAL_STEP
+    assert result["url"].startswith(AUTHORIZE_URL)
+
+    state = config_entry_oauth2_flow._encode_jwt(
+        hass,
+        {"flow_id": flow_id, "redirect_uri": REDIRECT_URI},
+    )
+    client = await hass_client_no_auth()
+    resp = await client.get(f"/auth/external/callback?code=abcd&state={state}")
+    assert resp.status == 200
+
+    aioclient_mock.post(
+        TOKEN_URL,
+        json={
+            "refresh_token": "new-refresh-token",
+            "access_token": "new-access-token",
+            "type": "Bearer",
+            "expires_in": 3600,
+        },
+    )
+
+    result = await hass.config_entries.flow.async_configure(flow_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "api_key"
+
+    aioclient_mock.get(f"{API_BASE_URL}/user/idTokens", json=[])
+    with patch(
+        "custom_components.volvo_wallbox.async_setup_entry", return_value=True
+    ):
+        result = await hass.config_entries.flow.async_configure(
+            flow_id, {CONF_API_KEY: "vcc-key"}
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert entry.data[CONF_TOKEN]["access_token"] == "new-access-token"
+    assert entry.data[CONF_WALLBOX_ID] == WALLBOX_ID
+
+
+async def test_options_flow(hass: HomeAssistant) -> None:
+    """The options flow stores the polling interval."""
+    entry = MockConfigEntry(domain=DOMAIN, unique_id=WALLBOX_ID)
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.volvo_wallbox.async_setup_entry", return_value=True
+    ):
+        result = await hass.config_entries.options.async_init(entry.entry_id)
+        assert result["type"] is FlowResultType.FORM
+        assert result["step_id"] == "init"
+
+        result = await hass.config_entries.options.async_configure(
+            result["flow_id"], {CONF_SCAN_INTERVAL: 120}
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options[CONF_SCAN_INTERVAL] == 120

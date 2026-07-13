@@ -10,6 +10,7 @@ import voluptuous as vol
 
 from homeassistant.config_entries import (
     SOURCE_REAUTH,
+    ConfigEntry,
     ConfigFlowResult,
     OptionsFlowWithReload,
 )
@@ -65,7 +66,7 @@ class VolvoWallboxFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry) -> VolvoWallboxOptionsFlow:  # noqa: ANN001
+    def async_get_options_flow(config_entry: ConfigEntry) -> VolvoWallboxOptionsFlow:
         """Return the options flow."""
         return VolvoWallboxOptionsFlow()
 
@@ -102,7 +103,7 @@ class VolvoWallboxFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
             try:
                 await api.async_get_id_tokens()
             except EnergyDeviceApiError:
-                _LOGGER.exception("API key validation failed")
+                _LOGGER.debug("API key validation failed", exc_info=True)
                 errors["base"] = "invalid_api_key"
             else:
                 self._config_data |= user_input
@@ -114,7 +115,7 @@ class VolvoWallboxFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
                 {
                     vol.Required(CONF_API_KEY): TextSelector(
                         TextSelectorConfig(
-                            type=TextSelectorType.TEXT, autocomplete="password"
+                            type=TextSelectorType.PASSWORD, autocomplete="password"
                         )
                     )
                 }
@@ -149,7 +150,7 @@ class VolvoWallboxFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
             try:
                 await api.async_get_wallbox_state(user_input[CONF_WALLBOX_ID])
             except EnergyDeviceApiError:
-                _LOGGER.exception("Wallbox ID validation failed")
+                _LOGGER.debug("Wallbox ID validation failed", exc_info=True)
                 errors["base"] = "invalid_wallbox_id"
             else:
                 self._config_data |= user_input
