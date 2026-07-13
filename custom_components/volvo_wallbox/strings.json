@@ -1,0 +1,232 @@
+{
+  "config": {
+    "step": {
+      "pick_implementation": {
+        "title": "Pick authentication method"
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Volvo Wallbox",
+        "description": "The Volvo Wallbox integration needs to re-authenticate your account."
+      },
+      "api_key": {
+        "title": "Enter your API key",
+        "description": "Get your API key from the [Volvo developers portal]({volvo_dev_portal}).",
+        "data": {
+          "api_key": "API key"
+        }
+      },
+      "wallbox_id": {
+        "title": "Enter your wallbox ID",
+        "description": "The ID of your wallbox (for example its serial number). It is validated against the Volvo API, so if one candidate fails, try another.",
+        "data": {
+          "wallbox_id": "Wallbox ID"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "The API key is not valid for the Energy Device API. Also verify that the SCOPES list in const.py matches the scopes on the developer portal.",
+      "invalid_wallbox_id": "No wallbox found with this ID. Try another value (serial number, PNC, ...)."
+    },
+    "abort": {
+      "already_configured": "This wallbox is already configured.",
+      "already_in_progress": "Configuration flow is already in progress.",
+      "authorize_url_timeout": "Timeout generating authorize URL.",
+      "missing_configuration": "The component is not configured. Please follow the documentation.",
+      "no_url_available": "No URL available.",
+      "oauth_error": "Received invalid token data.",
+      "oauth_failed": "Error while obtaining access token.",
+      "oauth_timeout": "Timeout resolving OAuth token.",
+      "oauth_unauthorized": "OAuth authorization error while obtaining access token.",
+      "reauth_successful": "Re-authentication was successful.",
+      "unique_id_mismatch": "The authenticated account does not match the configured wallbox."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Volvo Wallbox options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "charging_state": {
+        "name": "Charging state"
+      },
+      "current_session_energy": {
+        "name": "Current session energy"
+      },
+      "energy_today": {
+        "name": "Energy today"
+      },
+      "energy_this_month": {
+        "name": "Energy this month"
+      },
+      "energy_this_year": {
+        "name": "Energy this year"
+      },
+      "last_session_energy": {
+        "name": "Last session energy"
+      },
+      "last_session_start": {
+        "name": "Last session start"
+      },
+      "last_session_end": {
+        "name": "Last session end"
+      }
+    },
+    "button": {
+      "start_charging": {
+        "name": "Start charging"
+      },
+      "pause_charging": {
+        "name": "Pause charging"
+      }
+    },
+    "number": {
+      "charging_amp_limit": {
+        "name": "Charging amp limit"
+      },
+      "discharging_amp_limit": {
+        "name": "Discharging amp limit"
+      }
+    }
+  },
+  "services": {
+    "start_charging": {
+      "name": "Start charging",
+      "description": "Starts charging, optionally on behalf of an RFID ID token.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "id_token": {
+          "name": "ID token",
+          "description": "Optional RFID ID token to start the session with."
+        }
+      }
+    },
+    "apply_charging_schedule": {
+      "name": "Apply charging schedule",
+      "description": "Applies a transactional charging schedule to the wallbox.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "start": {
+          "name": "Start",
+          "description": "When the schedule starts."
+        },
+        "periods": {
+          "name": "Periods",
+          "description": "List of periods, each with type (watt or ampere), value and duration (HH:MM:SS)."
+        },
+        "schedule_id": {
+          "name": "Schedule ID",
+          "description": "Optional schedule identifier."
+        }
+      }
+    },
+    "get_charging_sessions": {
+      "name": "Get charging sessions",
+      "description": "Returns charging sessions in a time range.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "start": {
+          "name": "Start",
+          "description": "Range start."
+        },
+        "end": {
+          "name": "End",
+          "description": "Range end."
+        },
+        "id_token": {
+          "name": "ID token",
+          "description": "Optional RFID ID token filter."
+        }
+      }
+    },
+    "read_id_token": {
+      "name": "Read ID token",
+      "description": "Puts the wallbox in RFID read mode to learn a new token.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        }
+      }
+    },
+    "add_id_token": {
+      "name": "Add ID token",
+      "description": "Registers a new RFID ID token on your account.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "name": {
+          "name": "Name",
+          "description": "Friendly name for the token."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value."
+        }
+      }
+    },
+    "update_id_token": {
+      "name": "Update ID token",
+      "description": "Renames an existing RFID ID token.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "name": {
+          "name": "Name",
+          "description": "New friendly name."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value."
+        }
+      }
+    },
+    "delete_id_token": {
+      "name": "Delete ID token",
+      "description": "Removes an RFID ID token from your account.",
+      "fields": {
+        "device_id": {
+          "name": "Wallbox",
+          "description": "The wallbox device."
+        },
+        "token": {
+          "name": "Token",
+          "description": "The RFID token value to delete."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "operation_failed": {
+      "message": "Wallbox operation failed: {message} ({code})"
+    },
+    "api_error": {
+      "message": "Communication with the Volvo API failed: {message}"
+    },
+    "device_not_found": {
+      "message": "No Volvo Wallbox found for the given device."
+    },
+    "entry_not_loaded": {
+      "message": "The Volvo Wallbox config entry is not loaded."
+    }
+  }
+}

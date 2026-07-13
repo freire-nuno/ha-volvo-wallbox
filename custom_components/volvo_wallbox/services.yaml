@@ -1,0 +1,103 @@
+start_charging:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    id_token:
+      required: false
+      selector:
+        text:
+
+apply_charging_schedule:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    start:
+      required: true
+      selector:
+        datetime:
+    periods:
+      required: true
+      selector:
+        object:
+    schedule_id:
+      required: false
+      selector:
+        text:
+
+get_charging_sessions:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    start:
+      required: true
+      selector:
+        datetime:
+    end:
+      required: true
+      selector:
+        datetime:
+    id_token:
+      required: false
+      selector:
+        text:
+
+read_id_token:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+
+add_id_token:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    name:
+      required: true
+      selector:
+        text:
+    token:
+      required: true
+      selector:
+        text:
+
+update_id_token:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    name:
+      required: true
+      selector:
+        text:
+    token:
+      required: true
+      selector:
+        text:
+
+delete_id_token:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: volvo_wallbox
+    token:
+      required: true
+      selector:
+        text:
