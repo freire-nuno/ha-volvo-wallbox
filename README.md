@@ -77,13 +77,11 @@ ID) with the following entities and services.
    dot-separated serial).
 
 > **Note on credential lifetime:** a newly created Volvo API application has
-> *test* credentials that expire after ~30 days. When that happens, token
-> refresh fails and re-authentication keeps failing until you renew the
-> credentials in the developer portal and update them in Home Assistant
-> (Settings → Devices & services → menu → Application credentials → replace
-> the entry, then reauthenticate the integration). To avoid this entirely,
-> request **publication** of your application in the developer portal —
-> published (production) credentials are long-lived.
+> *test* credentials that expire after ~30 days. When that happens the
+> integration will ask for re-authentication — see
+> [Renewing expired credentials](#renewing-expired-credentials). To avoid
+> this entirely, request **publication** of your application in the
+> developer portal — published (production) credentials are long-lived.
 
 ## Installation
 
@@ -98,6 +96,30 @@ Home Assistant.
 3. Log in with your Volvo ID.
 4. Enter your VCC API key.
 5. Enter your wallbox ID.
+
+## Renewing expired credentials
+
+While your Volvo application is unpublished, its *test* client ID/secret
+expire after ~30 days. Token refresh then fails and the integration shows
+**"Reauthentication required"** — and reauthenticating alone is not enough,
+because Home Assistant would silently reuse the stored (expired) credential.
+The order matters:
+
+1. Renew the credentials in the
+   [Volvo developer portal](https://developer.volvocars.com/account/#your-api-applications)
+   (regenerate on the existing application, or create a new one).
+2. In Home Assistant, remove the stored credential first:
+   **Settings → Devices & services → ⋮ (top-right menu) → Application
+   credentials** → delete the *Volvo Wallbox* entry.
+3. Back on the integration tile, click **Reauthenticate**. Since no
+   credential is stored anymore, Home Assistant now asks for the **new
+   client ID and secret**, then sends you through the Volvo ID login.
+4. The flow re-validates your API key. If you created a *new* application
+   in step 1 (which also means a new VCC API key), the form appears so you
+   can paste the new key; otherwise this step is skipped.
+
+Your wallbox ID, device, entities, and history are all preserved — the
+config entry is updated in place, never recreated.
 
 ## Development
 
