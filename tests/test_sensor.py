@@ -6,8 +6,11 @@ from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from homeassistant.const import Platform
+from custom_components.volvo_wallbox.coordinator import WallboxData
+
+from homeassistant.const import STATE_UNKNOWN, Platform
 from homeassistant.core import HomeAssistant
 
 
@@ -51,6 +54,55 @@ async def test_sensor_states(
     hass: HomeAssistant, entity_id: str, expected_state: str
 ) -> None:
     """Sensors expose the coordinator-derived values."""
+    state = hass.states.get(entity_id)
+    assert state is not None
+    assert state.state == expected_state
+
+
+@pytest.mark.freeze_time("2026-07-12 12:00:00+00:00")
+@pytest.mark.usefixtures("setup_integration")
+@pytest.mark.parametrize(
+    ("entity_id", "expected_state"),
+    [
+        pytest.param(
+            "sensor.volvo_wallbox_current_session_energy", "0.0", id="idle"
+        ),
+        pytest.param(
+            "sensor.volvo_wallbox_last_session_energy",
+            STATE_UNKNOWN,
+            id="no_last_energy",
+        ),
+        pytest.param(
+            "sensor.volvo_wallbox_last_session_start",
+            STATE_UNKNOWN,
+            id="no_last_start",
+        ),
+        pytest.param(
+            "sensor.volvo_wallbox_last_session_end",
+            STATE_UNKNOWN,
+            id="no_last_end",
+        ),
+    ],
+)
+async def test_sensor_states_no_sessions(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    entity_id: str,
+    expected_state: str,
+) -> None:
+    """Sensors fall back correctly when there are no sessions."""
+    coordinator = mock_config_entry.runtime_data
+    coordinator.async_set_updated_data(
+        WallboxData(
+            state="AVAILABLE",
+            sessions=[],
+            current_session=None,
+            last_session=None,
+            energy_today=0.0,
+            energy_this_month=0.0,
+        )
+    )
+    await hass.async_block_till_done()
     state = hass.states.get(entity_id)
     assert state is not None
     assert state.state == expected_state
