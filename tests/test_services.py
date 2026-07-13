@@ -10,6 +10,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.volvo_wallbox.const import DOMAIN
+from custom_components.volvo_wallbox.services import async_setup_services
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
@@ -156,3 +157,22 @@ async def test_unknown_device_raises(hass: HomeAssistant) -> None:
             {"device_id": "not-a-device"},
             blocking=True,
         )
+
+
+async def test_entry_not_loaded_raises(
+    hass: HomeAssistant,
+    wallbox_device: dr.DeviceEntry,
+) -> None:
+    """A device whose config entry is not loaded raises a validation error."""
+    # Services are registered without setting the config entry up.
+    async_setup_services(hass)
+
+    with pytest.raises(ServiceValidationError) as excinfo:
+        await hass.services.async_call(
+            DOMAIN,
+            "read_id_token",
+            {"device_id": wallbox_device.id},
+            blocking=True,
+        )
+
+    assert excinfo.value.translation_key == "entry_not_loaded"

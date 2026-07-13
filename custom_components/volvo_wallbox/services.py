@@ -184,21 +184,30 @@ async def _read_id_token(call: ServiceCall) -> None:
 
 async def _add_id_token(call: ServiceCall) -> None:
     coordinator = _get_coordinator(call)
-    await coordinator.api.async_add_id_token(
-        call.data[ATTR_NAME], call.data[ATTR_TOKEN]
-    )
+    try:
+        await coordinator.api.async_add_id_token(
+            call.data[ATTR_NAME], call.data[ATTR_TOKEN]
+        )
+    except WallboxOperationError as err:
+        raise _wrap_operation_error(err) from err
 
 
 async def _update_id_token(call: ServiceCall) -> None:
     coordinator = _get_coordinator(call)
-    await coordinator.api.async_update_id_token(
-        call.data[ATTR_NAME], call.data[ATTR_TOKEN]
-    )
+    try:
+        await coordinator.api.async_update_id_token(
+            call.data[ATTR_NAME], call.data[ATTR_TOKEN]
+        )
+    except WallboxOperationError as err:
+        raise _wrap_operation_error(err) from err
 
 
 async def _delete_id_token(call: ServiceCall) -> None:
     coordinator = _get_coordinator(call)
-    await coordinator.api.async_delete_id_token(call.data[ATTR_TOKEN])
+    try:
+        await coordinator.api.async_delete_id_token(call.data[ATTR_TOKEN])
+    except WallboxOperationError as err:
+        raise _wrap_operation_error(err) from err
 
 
 @callback
