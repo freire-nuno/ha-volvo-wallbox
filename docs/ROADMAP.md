@@ -16,19 +16,23 @@ whole-branch code review; the full review history lived in the (git-ignored)
   order, submitted from the owner's account). Expect a months-long review
   queue; no effort while waiting.
 - **Reconfigure flow** *(review)* — the design spec promised
-  `async_step_reconfigure` (change API key / wallbox ID without re-adding);
-  the plan dropped it silently. Mirror the core `volvo` implementation.
+  `async_step_reconfigure`; the plan dropped it silently. Decision: allow
+  changing the **API key only** — the wallbox ID is the entry's `unique_id`
+  and stays locked, mirroring core volvo's VIN lock (recreate the entry to
+  change it). Mirror the core `volvo` implementation.
 - **Ruff config** *(review)* — add ruff + run once; several multi-line
   ternary lambdas in `sensor.py` would be reformatted.
 
 ## When real-world data arrives
 
-- **Charging-state enum** — `sensor.charging_state` passes the raw API
-  string through because the state values are undocumented. Once observed
-  values are known (from diagnostics of a live install), convert to
-  `SensorDeviceClass.ENUM` with `options` + translations.
+- ~~Charging-state enum~~ — resolved 2026-07-18: live data showed
+  `GET /wallbox/{id}` returns the wallbox identity, not a state; the sensor
+  is now a derived ENUM (`charging`/`idle` from open-session presence).
 - **OAuth grant duration** — if periodic re-login prompts appear on a
   published app, document the observed cadence in the README.
+- **Charging power sensor?** — with per-poll session energy deltas, an
+  approximate power (kW) sensor could be derived; evaluate usefulness after
+  observing how often `chargedEnergy` updates during an active session.
 
 ## Hardening (deferred minors from review)
 

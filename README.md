@@ -21,7 +21,7 @@ ID) with the following entities and services.
 
 | Entity | Description |
 |---|---|
-| `sensor.volvo_wallbox_charging_state` | Wallbox state as reported by the API |
+| `sensor.volvo_wallbox_charging_state` | `charging` / `idle`, derived from whether a charging session is open |
 | `sensor.volvo_wallbox_current_session_energy` | Energy of the ongoing charging session (kWh); `0.0` when idle |
 | `sensor.volvo_wallbox_energy_today` | Energy charged today (kWh, local-day boundary) — usable in the Energy dashboard |
 | `sensor.volvo_wallbox_energy_this_month` | Energy charged this month (kWh) — usable in the Energy dashboard |

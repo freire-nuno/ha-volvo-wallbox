@@ -31,6 +31,8 @@ class VolvoWallboxSensorDescription(SensorEntityDescription):
 SENSOR_DESCRIPTIONS: tuple[VolvoWallboxSensorDescription, ...] = (
     VolvoWallboxSensorDescription(
         key="charging_state",
+        device_class=SensorDeviceClass.ENUM,
+        options=["charging", "idle"],
         value_fn=lambda data: data.state,
     ),
     VolvoWallboxSensorDescription(

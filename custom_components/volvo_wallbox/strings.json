@@ -54,7 +54,11 @@
   "entity": {
     "sensor": {
       "charging_state": {
-        "name": "Charging state"
+        "name": "Charging state",
+        "state": {
+          "charging": "Charging",
+          "idle": "Idle"
+        }
       },
       "current_session_energy": {
         "name": "Current session energy"

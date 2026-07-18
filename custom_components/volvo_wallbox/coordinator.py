@@ -85,14 +85,13 @@ class WallboxCoordinator(DataUpdateCoordinator[WallboxData]):
         self.wallbox_id: str = entry.data[CONF_WALLBOX_ID]
 
     async def _async_update_data(self) -> WallboxData:
-        """Fetch wallbox state and this year's sessions."""
+        """Fetch this year's sessions and derive the wallbox state."""
         now = dt_util.now()
         year_start = dt_util.start_of_local_day(now.replace(month=1, day=1))
         month_start = dt_util.start_of_local_day(now.replace(day=1))
         today_start = dt_util.start_of_local_day(now)
 
         try:
-            state = await self.api.async_get_wallbox_state(self.wallbox_id)
             sessions = await self.api.async_get_charging_sessions(
                 self.wallbox_id, year_start, now
             )
@@ -101,10 +100,13 @@ class WallboxCoordinator(DataUpdateCoordinator[WallboxData]):
         except EnergyDeviceApiError as err:
             raise UpdateFailed(f"Error communicating with the Volvo API: {err}") from err
 
+        current_session = find_current_session(sessions)
+        # GET /wallbox/{id} returns the wallbox identity, not a state, so the
+        # charging state is derived from the presence of an open session.
         return WallboxData(
-            state=state,
+            state="charging" if current_session else "idle",
             sessions=sessions,
-            current_session=find_current_session(sessions),
+            current_session=current_session,
             last_session=find_last_completed_session(sessions),
             energy_today=energy_since(sessions, today_start),
             energy_this_month=energy_since(sessions, month_start),

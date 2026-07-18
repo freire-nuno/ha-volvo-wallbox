@@ -105,7 +105,7 @@ async def test_setup_entry(
     """The entry sets up and exposes coordinator data."""
     assert mock_config_entry.state is ConfigEntryState.LOADED
     coordinator = mock_config_entry.runtime_data
-    assert coordinator.data.state == "CHARGING"
+    assert coordinator.data.state == "charging"
     assert coordinator.data.energy_this_month == 18.0
     assert coordinator.data.energy_this_year == 18.0
 
@@ -116,7 +116,7 @@ async def test_setup_entry_auth_error_starts_reauth(
     mock_api: AsyncMock,
 ) -> None:
     """An auth error during setup puts the entry in reauth."""
-    mock_api.async_get_wallbox_state.side_effect = EnergyDeviceAuthError("expired")
+    mock_api.async_get_charging_sessions.side_effect = EnergyDeviceAuthError("expired")
 
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()
@@ -135,7 +135,7 @@ async def test_setup_entry_api_error_retries(
     mock_api: AsyncMock,
 ) -> None:
     """A generic API error during setup leads to setup retry."""
-    mock_api.async_get_wallbox_state.side_effect = EnergyDeviceApiError("boom")
+    mock_api.async_get_charging_sessions.side_effect = EnergyDeviceApiError("boom")
 
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()

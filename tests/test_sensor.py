@@ -26,7 +26,7 @@ def _sensor_only_platform() -> Generator[None]:
 @pytest.mark.parametrize(
     ("entity_id", "expected_state"),
     [
-        pytest.param("sensor.volvo_wallbox_charging_state", "CHARGING", id="state"),
+        pytest.param("sensor.volvo_wallbox_charging_state", "charging", id="state"),
         pytest.param(
             "sensor.volvo_wallbox_current_session_energy", "2.5", id="current"
         ),
@@ -95,7 +95,7 @@ async def test_sensor_states_no_sessions(
     coordinator = mock_config_entry.runtime_data
     coordinator.async_set_updated_data(
         WallboxData(
-            state="AVAILABLE",
+            state="idle",
             sessions=[],
             current_session=None,
             last_session=None,
